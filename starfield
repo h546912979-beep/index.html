@@ -61,3 +61,33 @@ function drawStars() {
     ctx.arc(sx, sy, size, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(255, 255, 255, ${star.o})`;
     ctx.fill();
+  }
+}
+
+function updateStars() {
+  for (let star of stars) {
+    star.z -= 2;
+    if (star.z <= 0) {
+      star.x = Math.random() * width;
+      star.y = Math.random() * height;
+      star.z = width;
+    }
+  }
+}
+
+function animate() {
+  updateStars();
+  drawStars();
+  requestAnimationFrame(animate);
+}
+
+canvas.addEventListener("mousemove", e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+createStars(800);
+animate();
+</script>
+</body>
+</html>
