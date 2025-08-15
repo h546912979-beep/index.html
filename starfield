@@ -1,46 +1,63 @@
-<canvas id="starfield" style="position:absolute;top:0;left:0;width:100%;height:100%;"></canvas>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Starfield</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: black;
+    height: 100%;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
 <script>
-const canvas = document.getElementById('starfield');
-const ctx = canvas.getContext('2d');
+const canvas = document.getElementById("starfield");
+const ctx = canvas.getContext("2d");
 let stars = [];
-let mouseX = 0, mouseY = 0;
+let mouse = { x: 0, y: 0 };
+let width, height;
 
 function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
 }
+window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
 
-function createStars() {
+function createStars(count) {
   stars = [];
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < count; i++) {
     stars.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      size: Math.random() * 2,
-      speed: Math.random() * 0.5 + 0.1
+      x: Math.random() * width,
+      y: Math.random() * height,
+      z: Math.random() * width,
+      o: Math.random()
     });
   }
 }
-createStars();
-
-canvas.addEventListener('mousemove', e => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-});
 
 function drawStars() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = 'white';
-  stars.forEach(star => {
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = "white";
+  for (let star of stars) {
+    let k = 128.0 / star.z;
+    let sx = (star.x - width / 2) * k + width / 2;
+    let sy = (star.y - height / 2) * k + height / 2;
+    if (sx < 0 || sx >= width || sy < 0 || sy >= height) continue;
+    let size = (1 - star.z / width) * 2;
     ctx.beginPath();
-    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+    ctx.arc(sx, sy, size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${star.o})`;
     ctx.fill();
-    star.y += star.speed;
-    if (star.y > canvas.height) star.y = 0;
-  });
-  requestAnimationFrame(drawStars);
-}
-drawStars();
-</script>
