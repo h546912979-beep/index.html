@@ -38,8 +38,8 @@ function createStars(count) {
   stars = [];
   for (let i = 0; i < count; i++) {
     stars.push({
-      x: Math.random() * width,
-      y: Math.random() * height,
+      x: Math.random() * width - width / 2,
+      y: Math.random() * height - height / 2,
       z: Math.random() * width,
       o: Math.random()
     });
@@ -50,11 +50,10 @@ function drawStars() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = "white";
   for (let star of stars) {
     let k = 128.0 / star.z;
-    let sx = (star.x - width / 2) * k + width / 2;
-    let sy = (star.y - height / 2) * k + height / 2;
+    let sx = star.x * k + width / 2;
+    let sy = star.y * k + height / 2;
     if (sx < 0 || sx >= width || sy < 0 || sy >= height) continue;
     let size = (1 - star.z / width) * 2;
     ctx.beginPath();
@@ -65,13 +64,24 @@ function drawStars() {
 }
 
 function updateStars() {
+  // Calculate movement based on mouse position
+  let dx = (mouse.x - width/2) / 100;
+  let dy = (mouse.y - height/2) / 100;
+
   for (let star of stars) {
+    star.x += dx;
+    star.y += dy;
     star.z -= 2;
     if (star.z <= 0) {
-      star.x = Math.random() * width;
-      star.y = Math.random() * height;
+      star.x = Math.random() * width - width / 2;
+      star.y = Math.random() * height - height / 2;
       star.z = width;
     }
+    // Wrap around if star goes out of bounds horizontally/vertically
+    if (star.x > width/2) star.x = -width/2;
+    if (star.x < -width/2) star.x = width/2;
+    if (star.y > height/2) star.y = -height/2;
+    if (star.y < -height/2) star.y = height/2;
   }
 }
 
